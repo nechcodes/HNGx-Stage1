@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Random;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 public class UserController {
@@ -26,23 +27,23 @@ public class UserController {
         // Get the current day of the week
         DayOfWeek dayOfWeek = LocalDateTime.now().getDayOfWeek();
 
-        // Get the current UTC time
-        LocalDateTime currentUtcTime = LocalDateTime.now(ZoneOffset.UTC);
+                // Create a random number generator
+                Random random = new Random();
 
-        // Generate UTC time within +/- 2 minutes of the current time
-        long minutesToAdd = ThreadLocalRandom.current().nextLong(-2, 3);
-        LocalDateTime generatedUtcTime = currentUtcTime.plusMinutes(minutesToAdd);
+                // Generate a random number between -2 and 2
+                int randomMinutes = random.nextInt(5) - 2;
 
-        // Ensure the generated time is within +/- 2 minutes
-        if (generatedUtcTime.isBefore(currentUtcTime.minusMinutes(2))) {
-            generatedUtcTime = currentUtcTime.minusMinutes(2);
-        } else if (generatedUtcTime.isAfter(currentUtcTime.plusMinutes(2))) {
-            generatedUtcTime = currentUtcTime.plusMinutes(2);
-        }
+                // Get the current UTC time
+                Instant currentUTC = Instant.now().truncatedTo(ChronoUnit.MINUTES);
 
-        String githubFile = "https:github.come/nechcodes/HNGx Stage1/StageApplication.java";
+                // Add the random number of minutes
+                Instant adjustedUTC = currentUTC.plus(randomMinutes, ChronoUnit.MINUTES);
 
-        String githubRepoUrl = "https:github.come/nechcodes/HNGx Stage1";
+        //Set the GitHub file url
+        String githubFile = "https://github.com/nechcodes/HNGx-Stage1/blob/master/src/main/java/com/example/stage/StageApplication.java";
+
+        //Set the GitHub repository url
+        String githubRepoUrl = "https://github.com/nechcodes/HNGx-Stage1/tree/master";
 
 
         // Set the HTTP status code to 200 (OK)
@@ -51,7 +52,7 @@ public class UserController {
         // Populate the response map
         response.put("slack_name", slack_name);
         response.put("current_day", dayOfWeek.toString());
-        response.put("utc_time", generatedUtcTime.toString());
+        response.put("utc_time", adjustedUTC.toString());
         response.put("track", track);
         response.put("github_file_url", githubFile);
         response.put("github_repo_url", githubRepoUrl);
